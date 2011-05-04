@@ -1,7 +1,7 @@
 (ns coloured-balls.core
   (:use [rosado.processing]
         [rosado.processing.applet]
-	[coloured-balls.motion])
+	)
   (:gen-class))
 
 ;; here's a function which will be called by Processing's (PApplet)
@@ -16,25 +16,36 @@
 (defn make-ball []
   {:x (+ 25 (rand-int 350)) :y (+ 25 (rand-int 350)) :red (rand-int 256) :blue (rand-int 256) :green (rand-int 256) :radius (+ 1 (rand-int 70))})
 
-(def ball (conj (make-ball) {:velocity 15 :heading (rand-int 360)}))
+(def ball (atom (conj (make-ball) {:x-velocity 15 :y-velocity 360})))
+
+(defn vert-bounce [ball]
+  (conj ball {:y-velocity (- (:y-velocity ball))}))
+
+(defn horiz-bounce [ball]
+  (conj ball {:x-velocity (- (:x-velocity ball))}))
+
+(defn move [ball]
+  (let [old-x (:x ball)
+	old-y (:y ball)
+	delta-x (:x-velocity ball)
+	delta-y (:y-velocity ball)]
+    (conj {:x (+ old-x delta-x) :y (+ old-y delta-y)} (dissoc ball :x :y))
+    ))
+
+(defn bounce [ball]
+  (cond
+   (< (:x ball) 0) (move (horiz-bounce ball))
+   (> (:x ball) 400) (move (horiz-bounce ball))
+   (< (:y ball) 0) (move (vert-bounce ball))
+   (> (:y ball) 400) (move (vert-bounce ball))
+   :else (move ball)))
 
 (defn draw
   "Example usage of with-translation and with-rotation."
   []
-  (def ball ball)
   (background-float 125)
-  (draw-ball ball)
-  (when (or 
-	 (> (:y ball) (- 400 (/ (ball :radius) 2)))
-	 (< (:y ball) (/ (ball :radius) 2)))
-    (def ball (conj ball {:heading (- 360 (:heading ball)) :radius (+ 1 (:radius ball))}))
-    )
-  (when (or 
-	 (> (:x ball) (- 400 (/ (ball :radius) 2)))
-	 (< (:x ball) (/ (ball :radius) 2)))
-    (def ball (conj ball {:heading (- 180 (:heading ball)) :radius (+ 1 (:radius ball))}))
-    )
-  (def ball (move ball))
+  (draw-ball @ball)
+  (swap! ball bounce)
   )
 
 (defn setup []
