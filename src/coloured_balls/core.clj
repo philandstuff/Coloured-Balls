@@ -16,20 +16,21 @@
 (defn make-ball []
   {:x (+ 25 (rand-int 350)) :y (+ 25 (rand-int 350)) :red (rand-int 256) :blue (rand-int 256) :green (rand-int 256) :radius (+ 1 (rand-int 70))})
 
-(def ball (atom (conj (make-ball) {:x-velocity 15 :y-velocity 360})))
+(def ball (atom (conj (make-ball) {:x-velocity 15 :y-velocity 10})))
 
 (defn vert-bounce [ball]
-  (conj ball {:y-velocity (- (:y-velocity ball))}))
+  (conj ball {:y-velocity (* (- 0.8) (:y-velocity ball))}))
 
 (defn horiz-bounce [ball]
-  (conj ball {:x-velocity (- (:x-velocity ball))}))
+  (conj ball {:x-velocity (* (- 0.9) (:x-velocity ball))}))
 
 (defn move [ball]
   (let [old-x (:x ball)
 	old-y (:y ball)
 	delta-x (:x-velocity ball)
-	delta-y (:y-velocity ball)]
-    (conj {:x (+ old-x delta-x) :y (+ old-y delta-y)} (dissoc ball :x :y))
+	delta-y (:y-velocity ball)
+	delta-delta-y 5]
+       (conj {:x (+ old-x delta-x) :y (+ old-y delta-y) :y-velocity (+ delta-y delta-delta-y)} (dissoc ball :x :y :y-velocity))
     ))
 
 (defn bounce [ball]
@@ -53,7 +54,7 @@
   (smooth)
   (no-stroke)
   (fill 226)
-  (framerate 10))
+  (framerate 20))
 
 ;; Now we just need to define an applet:
 
