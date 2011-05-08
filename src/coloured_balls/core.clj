@@ -9,9 +9,12 @@
 ;; interactively, you can redefine it while the applet is running and
 ;; see effects immediately
 
+(defn flip [y-coord]
+  (- 400 y-coord))
+
 (defn draw-ball [ball]
 	(fill (:red ball) (:green ball) (:blue ball))
-	(ellipse (:x ball) (:y ball) (:radius ball) (:radius ball)))
+	(ellipse (:x ball) (flip (:y ball)) (:radius ball) (:radius ball)))
 
 (defn make-ball []
   {:x 50 :y 200 :red 255 :blue 0 :green 0 :radius 30})
@@ -34,13 +37,11 @@
 
 (defn accelerate [ball]
   (let [v (:y-velocity ball)
-	dv 5]
+	dv -5]
     (conj {:y-velocity (+ v dv)} (dissoc ball :y-velocity))))
 
 (defn hit-ground? [ball]
-  (or
-   (< (:y ball) 0)
-   (> (:y ball) 400)))
+  (< (:y ball) 0))
 
 (defn hit-wall? [ball]
   (or
