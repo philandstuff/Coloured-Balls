@@ -31,15 +31,19 @@
 	delta-y (:y-velocity ball)
 	delta-delta-y 5]
        (conj {:x (+ old-x delta-x) :y (+ old-y delta-y) :y-velocity (+ delta-y delta-delta-y)} (dissoc ball :x :y :y-velocity))
-    ))
+       ))
+
+(defn hit-ground [ball]
+  (or
+   (< (:y ball) 0)
+   (> (:y ball) 400)))
 
 (defn bounce [ball]
   (let [new-ball
 	(cond
 	 (< (:x ball) 0) (horiz-bounce ball)
 	 (> (:x ball) 400) (horiz-bounce ball)
-	 (< (:y ball) 0) (vert-bounce ball)
-	 (> (:y ball) 400) (vert-bounce ball)
+	 (hit-ground ball) (vert-bounce ball)
 	 :else ball)]
     (move new-ball)))
 
