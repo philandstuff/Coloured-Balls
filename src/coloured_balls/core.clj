@@ -14,7 +14,7 @@
 	(ellipse (:x ball) (:y ball) (:radius ball) (:radius ball)))
 
 (defn make-ball []
-  {:x (+ 25 (rand-int 350)) :y (+ 25 (rand-int 350)) :red (rand-int 256) :blue (rand-int 256) :green (rand-int 256) :radius (+ 1 (rand-int 70))})
+  {:x 50 :y 200 :red 255 :blue 0 :green 0 :radius 30})
 
 (def ball (atom (conj (make-ball) {:x-velocity 15 :y-velocity 10})))
 
