@@ -9,8 +9,11 @@
 ;; interactively, you can redefine it while the applet is running and
 ;; see effects immediately
 
+(def x-size 400)
+(def y-size 400)
+
 (defn flip [y-coord]
-  (- 400 y-coord))
+  (- y-size y-coord))
 
 (defn draw-ball [ball]
 	(fill (:red ball) (:green ball) (:blue ball))
@@ -19,13 +22,13 @@
 (defn make-ball []
   {:x 50 :y 200 :red 255 :blue 0 :green 0 :radius 30})
 
-(def ball (atom (conj (make-ball) {:x-velocity 15 :y-velocity 10})))
+(def ball (atom (conj (make-ball) {:x-velocity 5 :y-velocity 5})))
 
 (defn vert-bounce [ball]
   (conj ball {:y-velocity (* (- 0.8) (:y-velocity ball))}))
 
 (defn horiz-bounce [ball]
-  (conj ball {:x-velocity (* (- 0.9) (:x-velocity ball))}))
+  (conj ball {:x-velocity (* (- 1) (:x-velocity ball))}))
 
 (defn move [ball]
   (let [x (:x ball)
@@ -35,9 +38,11 @@
        (conj {:x (+ x dx) :y (+ y dy)} (dissoc ball :x :y))
        ))
 
+(def default-gravity -2)
+
 (defn accelerate [ball]
   (let [v (:y-velocity ball)
-	dv -5]
+	dv default-gravity]
     (conj {:y-velocity (+ v dv)} (dissoc ball :y-velocity))))
 
 (defn hit-ground? [ball]
@@ -48,9 +53,9 @@
      (< dy 0))))
 
 (defn hit-wall? [ball]
-  (or
-   (< (:x ball) 0)
-   (> (:x ball) 400)))
+  (let [x (:x ball) radius (:radius ball)] (or
+   (< x radius)
+   (> x (- x-size radius)))))
 
 (defn bounce [ball]
   (let [new-ball
@@ -78,7 +83,7 @@
 ;; Now we just need to define an applet:
 
 (defapplet balls :title "Coloured balls"
-  :setup setup :draw draw :size [400 400])
+  :setup setup :draw draw :size [x-size y-size])
 
 (defn -main [& args]
  (run balls true))
