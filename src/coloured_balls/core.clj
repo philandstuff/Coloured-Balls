@@ -25,13 +25,17 @@
   (conj ball {:x-velocity (* (- 0.9) (:x-velocity ball))}))
 
 (defn move [ball]
-  (let [old-x (:x ball)
-	old-y (:y ball)
-	delta-x (:x-velocity ball)
-	delta-y (:y-velocity ball)
-	delta-delta-y 5]
-       (conj {:x (+ old-x delta-x) :y (+ old-y delta-y) :y-velocity (+ delta-y delta-delta-y)} (dissoc ball :x :y :y-velocity))
+  (let [x (:x ball)
+	y (:y ball)
+	dx (:x-velocity ball)
+	dy (:y-velocity ball)]
+       (conj {:x (+ x dx) :y (+ y dy)} (dissoc ball :x :y))
        ))
+
+(defn accelerate [ball]
+  (let [v (:y-velocity ball)
+	dv 5]
+    (conj {:y-velocity (+ v dv)} (dissoc ball :y-velocity))))
 
 (defn hit-ground? [ball]
   (or
@@ -49,7 +53,7 @@
 	 (hit-wall? ball) (horiz-bounce ball)
 	 (hit-ground? ball) (vert-bounce ball)
 	 :else ball)]
-    (move new-ball)))
+    (accelerate (move new-ball))))
 
 (defn draw
   "Example usage of with-translation and with-rotation."
