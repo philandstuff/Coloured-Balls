@@ -38,11 +38,15 @@
    (< (:y ball) 0)
    (> (:y ball) 400)))
 
+(defn hit-wall [ball]
+  (or
+   (< (:x ball) 0)
+   (> (:x ball) 400)))
+
 (defn bounce [ball]
   (let [new-ball
 	(cond
-	 (< (:x ball) 0) (horiz-bounce ball)
-	 (> (:x ball) 400) (horiz-bounce ball)
+	 (hit-wall ball) (horiz-bounce ball)
 	 (hit-ground ball) (vert-bounce ball)
 	 :else ball)]
     (move new-ball)))
