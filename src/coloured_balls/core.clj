@@ -41,7 +41,11 @@
     (conj {:y-velocity (+ v dv)} (dissoc ball :y-velocity))))
 
 (defn hit-ground? [ball]
-  (< (:y ball) 0))
+  (let [y (:y ball),
+	dy (:y-velocity ball) radius (:radius ball)]
+    (and
+     (<= y radius)
+     (< dy 0))))
 
 (defn hit-wall? [ball]
   (or
