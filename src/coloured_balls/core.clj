@@ -34,17 +34,19 @@
     ))
 
 (defn bounce [ball]
-  (cond
-   (< (:x ball) 0) (move (horiz-bounce ball))
-   (> (:x ball) 400) (move (horiz-bounce ball))
-   (< (:y ball) 0) (move (vert-bounce ball))
-   (> (:y ball) 400) (move (vert-bounce ball))
-   :else (move ball)))
+  (let [new-ball
+	(cond
+	 (< (:x ball) 0) (horiz-bounce ball)
+	 (> (:x ball) 400) (horiz-bounce ball)
+	 (< (:y ball) 0) (vert-bounce ball)
+	 (> (:y ball) 400) (vert-bounce ball)
+	 :else ball)]
+    (move new-ball)))
 
 (defn draw
   "Example usage of with-translation and with-rotation."
   []
-  (background-float 125)
+  (background-float 0)
   (draw-ball @ball)
   (swap! ball bounce)
   )
