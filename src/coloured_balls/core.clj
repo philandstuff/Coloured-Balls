@@ -33,12 +33,12 @@
        (conj {:x (+ old-x delta-x) :y (+ old-y delta-y) :y-velocity (+ delta-y delta-delta-y)} (dissoc ball :x :y :y-velocity))
        ))
 
-(defn hit-ground [ball]
+(defn hit-ground? [ball]
   (or
    (< (:y ball) 0)
    (> (:y ball) 400)))
 
-(defn hit-wall [ball]
+(defn hit-wall? [ball]
   (or
    (< (:x ball) 0)
    (> (:x ball) 400)))
@@ -46,8 +46,8 @@
 (defn bounce [ball]
   (let [new-ball
 	(cond
-	 (hit-wall ball) (horiz-bounce ball)
-	 (hit-ground ball) (vert-bounce ball)
+	 (hit-wall? ball) (horiz-bounce ball)
+	 (hit-ground? ball) (vert-bounce ball)
 	 :else ball)]
     (move new-ball)))
 
