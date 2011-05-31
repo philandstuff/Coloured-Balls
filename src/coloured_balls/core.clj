@@ -76,13 +76,23 @@
   (< (distance ball-1 ball-2)
      (+ (:radius ball-1) (:radius ball-2))))
 
-(defn bounce-balls [[ball-1 ball-2]]
-  (if (hit? ball-1 ball-2)
-    (bounce ball-1 ball-2)
-    [ball-1 ball-2]))
+(defn average-key [a b k]
+  (/ (+ (k a) (k b)) 2))
+
+(defn merge-ball [ball-1 ball-2]
+  (conj (into {} (map (fn [[k _]] [k (average-key ball-1 ball-2 k)]) ball-1))
+	{:radius (+ (:radius ball-1) (:radius ball-2))}))
+
+(defn merge-balls [balls]
+  (if (= 1 (count balls))
+    balls
+    (let [[ball-1 ball-2] balls]
+      (if (hit? ball-1 ball-2)
+	[(merge-ball ball-1 ball-2)]
+	[ball-1 ball-2]))))
 
 (defn transform-balls [balls]
-  (map bounce-walls (bounce-balls balls)))
+  (map bounce-walls (merge-balls balls)))
 
 (defn draw
   "Example usage of with-translation and with-rotation."
@@ -105,6 +115,3 @@
 
 (defn -main [& args]
   (run app-balls true))
-
-
-
