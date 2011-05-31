@@ -1,6 +1,7 @@
 (ns coloured-balls.core
   (:use [rosado.processing]
         [rosado.processing.applet]
+	[coloured-balls.collision]
 	)
   (:gen-class))
 
@@ -17,12 +18,15 @@
 
 (defn draw-ball [ball]
 	(fill (:red ball) (:green ball) (:blue ball))
-	(ellipse (:x ball) (flip (:y ball)) (:radius ball) (:radius ball)))
+	(ellipse (:x ball) (flip (:y ball)) (* 2 (:radius ball)) (* 2 (:radius ball))))
 
 (defn make-ball []
-  {:x 50 :y 200 :red 255 :blue 0 :green 0 :radius 30})
+  {:x (rand-int 200) :y (+ 200 (rand-int 200)) :red (+ 100 (rand-int 155)) :blue 0 :green 0 :radius 15 :x-velocity 5 :y-velocity 5})
 
-(def ball (atom (conj (make-ball) {:x-velocity 5 :y-velocity 5})))
+(defn make-balls [number]
+  (repeatedly number make-ball))
+
+(def balls (atom (make-balls 2)))
 
 (defn vert-bounce [ball]
   (conj ball {:y-velocity (* (- 0.8) (:y-velocity ball))}))
@@ -49,15 +53,15 @@
   (let [y (:y ball),
 	dy (:y-velocity ball) radius (:radius ball)]
     (and
-     (<= y radius)
+     (<= y (* 2 radius))
      (< dy 0))))
 
 (defn hit-wall? [ball]
   (let [x (:x ball) radius (:radius ball)] (or
-   (< x radius)
+   (< x (* 2 radius))
    (> x (- x-size radius)))))
 
-(defn bounce [ball]
+(defn bounce-walls [ball]
   (let [new-ball
 	(cond
 	 (hit-wall? ball) (horiz-bounce ball)
@@ -65,13 +69,27 @@
 	 :else ball)]
     (accelerate (move new-ball))))
 
+(defn bounce [ball-1 ball-2]
+  (map (comp vert-bounce horiz-bounce) [ball-1 ball-2]))
+
+(defn hit? [ball-1 ball-2]
+  (< (distance ball-1 ball-2)
+     (+ (:radius ball-1) (:radius ball-2))))
+
+(defn bounce-balls [[ball-1 ball-2]]
+  (if (hit? ball-1 ball-2)
+    (bounce ball-1 ball-2)
+    [ball-1 ball-2]))
+
+(defn transform-balls [balls]
+  (map bounce-walls (bounce-balls balls)))
+
 (defn draw
   "Example usage of with-translation and with-rotation."
   []
   (background-float 0)
-  (draw-ball @ball)
-  (swap! ball bounce)
-  )
+  (doseq [ball @balls] (draw-ball ball))
+  (swap! balls transform-balls))
 
 (defn setup []
   "Runs once."
@@ -82,9 +100,11 @@
 
 ;; Now we just need to define an applet:
 
-(defapplet balls :title "Coloured balls"
+(defapplet app-balls :title "Coloured balls"
   :setup setup :draw draw :size [x-size y-size])
 
 (defn -main [& args]
- (run balls true))
+  (run app-balls true))
+
+
 
