@@ -21,7 +21,7 @@
 	(ellipse (:x ball) (flip (:y ball)) (* 2 (:radius ball)) (* 2 (:radius ball))))
 
 (defn make-ball []
-  {:x (rand-int 200) :y (+ 200 (rand-int 200)) :red (+ 100 (rand-int 155)) :blue 0 :green 0 :radius 15 :x-velocity 5 :y-velocity 5})
+  {:x (rand-int 200) :y (+ 200 (rand-int 200)) :red (+ 100 (rand-int 155)) :blue 0 :green 0 :radius 15 :x-velocity (rand-int 5)  :y-velocity (rand-int 5)})
 
 (defn make-balls [number]
   (repeatedly number make-ball))
