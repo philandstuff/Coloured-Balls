@@ -5,13 +5,8 @@
 	)
   (:gen-class))
 
-;; here's a function which will be called by Processing's (PApplet)
-;; draw method every frame. Place your code here. If you eval it
-;; interactively, you can redefine it while the applet is running and
-;; see effects immediately
-
-(def x-size 400)
-(def y-size 400)
+(def x-size 800)
+(def y-size 1000)
 
 (defn flip [y-coord]
   (- y-size y-coord))
@@ -21,7 +16,7 @@
 	(ellipse (:x ball) (flip (:y ball)) (* 2 (:radius ball)) (* 2 (:radius ball))))
 
 (defn make-ball []
-  {:x (rand-int 200) :y (+ 200 (rand-int 200)) :red (+ 100 (rand-int 155)) :blue 0 :green 0 :radius 15 :x-velocity (rand-int 5)  :y-velocity (rand-int 5)})
+  {:x (+ 50 (rand-int (- x-size 100))) :y (+ 200 (rand-int (- y-size 250))) :red (+ 100 (rand-int 155)) :blue 0 :green 0 :radius 50 :x-velocity (rand-int 5)  :y-velocity (rand-int 5)})
 
 (defn make-balls [number]
   (repeatedly number make-ball))
@@ -51,9 +46,10 @@
 
 (defn hit-ground? [ball]
   (let [y (:y ball),
-	dy (:y-velocity ball) radius (:radius ball)]
+	dy (:y-velocity ball)
+	radius (:radius ball)]
     (and
-     (<= y (* 2 radius))
+     (<= y radius)
      (< dy 0))))
 
 (defn hit-wall? [ball]
@@ -94,9 +90,7 @@
 (defn transform-balls [balls]
   (map bounce-walls (merge-balls balls)))
 
-(defn draw
-  "Example usage of with-translation and with-rotation."
-  []
+(defn draw  []
   (background-float 0)
   (doseq [ball @balls] (draw-ball ball))
   (swap! balls transform-balls))
@@ -107,8 +101,6 @@
   (no-stroke)
   (fill 226)
   (framerate 20))
-
-;; Now we just need to define an applet:
 
 (defapplet app-balls :title "Coloured balls"
   :setup setup :draw draw :size [x-size y-size])
